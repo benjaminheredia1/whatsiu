@@ -51,6 +51,10 @@ RUN echo '[supervisord]' > /etc/supervisor/conf.d/laravel.conf && \
     echo 'autostart=true' >> /etc/supervisor/conf.d/laravel.conf && \
     echo 'autorestart=true' >> /etc/supervisor/conf.d/laravel.conf
 
+# Copiar y dar permisos al script de inicio
+COPY docker/start.sh /start.sh
+RUN chmod +x /start.sh
+
 # Dar permisos a las carpetas de almacenamiento
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
     chmod -R 775 /var/www/storage /var/www/bootstrap/cache
@@ -59,4 +63,4 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
 EXPOSE 80
 
 # Script de inicio
-CMD php artisan migrate --force && /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+CMD ["/start.sh"]
