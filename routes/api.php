@@ -9,5 +9,6 @@ Route::middleware(AuthMiddleware::class)->group(function () {
     Route::get('/conversations/{session_id}', [ChatController::class, 'show']);
     Route::post('/conversations/{session_id}/send', [ChatController::class, 'send']);
     Route::put('/conversations/{session_id}/estado', [ChatController::class, 'updateEstado']);
+    Route::get('/conversations/{session_id}/status', [ChatController::class, 'getStatus']);
     Route::post('/memory', [ChatController::class, 'storeMemory']);
 });

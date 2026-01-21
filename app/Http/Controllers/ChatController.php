@@ -101,6 +101,23 @@ class ChatController extends Controller
         ]);
     }
 
+    public function getStatus(string $sessionId): JsonResponse
+    {
+        $estado = Estado::find($sessionId);
+        $lastMessage = Memory::where('session_id', $sessionId)->orderBy('id', 'desc')->first();
+        $totalMessages = Memory::where('session_id', $sessionId)->count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'session_id' => $sessionId,
+                'estado' => $estado ? $estado->estado : 'activo',
+                'total_messages' => $totalMessages,
+                'last_message_at' => $lastMessage ? $lastMessage->created_at : null,
+            ],
+        ]);
+    }
+
     public function updateEstado(Request $request, string $sessionId): JsonResponse
     {
         $request->validate(['estado' => 'required|string|in:activo,pausado']);
