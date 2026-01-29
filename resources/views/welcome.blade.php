@@ -670,13 +670,23 @@
             if (!content) return '';
             
             // Detectar si el mensaje contiene información de herramientas
-            // Formato: [Used tools: Tool: X, Input: {}, Result: {}; ...] mensaje_real
-            const toolsPattern = /\[Used tools:.*?\]/s;
+            // Puede tener diferentes formatos:
+            // Formato 1: [Used tools: Tool: X, Input: {}, Result: {}; ...] mensaje_real
+            // Formato 2: ,JSON...Tool: X, Input: {}, Result: {}...] mensaje_real
+            // El patrón común es que contiene "Tool:" seguido de nombres de herramientas
+            // y termina con un ] antes del mensaje real para el usuario
             
+            // Primero intentamos el patrón [Used tools:...]
+            let toolsPattern = /\[Used tools:.*\]/s;
             if (toolsPattern.test(content)) {
-                // Remover la sección de herramientas y obtener solo el mensaje limpio
-                const cleanContent = content.replace(toolsPattern, '').trim();
-                return cleanContent;
+                return content.replace(toolsPattern, '').trim();
+            }
+            
+            // Si no, buscamos el patrón de Tool: seguido de nombres y que termine con ]
+            // Este patrón captura desde el inicio hasta el último ] que precede al mensaje
+            toolsPattern = /^.*Tool:\s*\w+.*\]\s*/s;
+            if (toolsPattern.test(content)) {
+                return content.replace(toolsPattern, '').trim();
             }
             
             return content;

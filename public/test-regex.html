@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Regex - Parseo de Mensajes</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #111;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .result {
+            background: #222;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid #0f0;
+            border-radius: 5px;
+        }
+
+        .raw {
+            background: #300;
+            border-left-color: #f00;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Test de Parseo - Múltiples Formatos</h1>
+
+    <h2>Ejemplo 1: Con [Used tools:]</h2>
+    <div class="result raw" id="raw1"></div>
+    <div class="result" id="parsed1"></div>
+
+    <h2>Ejemplo 2: Sin [Used tools:] (tu caso)</h2>
+    <div class="result raw" id="raw2"></div>
+    <div class="result" id="parsed2"></div>
+
+    <script>
+        function parseMessageContent(content) {
+            if (!content) return '';
+
+            // Primero intentamos el patrón [Used tools:...]
+            let toolsPattern = /\[Used tools:.*\]/s;
+            if (toolsPattern.test(content)) {
+                return content.replace(toolsPattern, '').trim();
+            }
+
+            // Si no, buscamos el patrón de Tool: seguido de nombres y que termine con ]
+            toolsPattern = /^.*Tool:\s*\w+.*\]\s*/s;
+            if (toolsPattern.test(content)) {
+                return content.replace(toolsPattern, '').trim();
+            }
+
+            return content;
+        }
+
+        // Ejemplo 1
+        const msg1 = `[Used tools: Tool: Think1, Input: {}, Result: {}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {}] Perfecto ✅ Tu pedido está confirmado.`;
+        document.getElementById('raw1').textContent = msg1;
+        document.getElementById('parsed1').textContent = parseMessageContent(msg1);
+
+        // Ejemplo 2 (tu caso)
+        const msg2 = `,"NOMBRE_TITULAR":"Pablo Benjamin Heredia Ruiz","CEDULA":"12534694","id":"call_Da2DVmMPSkpmzT5XAaozZ6HE","toolCallId":"call_Z6cKPOwCDaBZbDMqJKC2kj0D"}; Tool: Think1, Input: {}, Result: {}; Tool: Calculator1, Input: "30*2500", Result: {"response":"75000"}; Tool: REPORTAR_PINAR1, Input: {}, Result: {"id":"19c0ba1d3c3e6e35","threadId":"19c0ba1d3c3e6e35","labelIds":["SENT"]}] Parece que he tenido algunos problemas para registrar tu información. Estoy reportando el problema para que un asesor se comunique contigo y complete tu registro.`;
+
+        document.getElementById('raw2').textContent = msg2;
+        document.getElementById('parsed2').textContent = parseMessageContent(msg2);
+    </script>
+</body>
+
+</html>
