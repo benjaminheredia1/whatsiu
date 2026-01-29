@@ -494,7 +494,8 @@
             }
 
             list.innerHTML = filtered.map(conv => {
-                const lastMessage = conv.last_message?.content || 'Sin mensajes';
+                const rawLastMessage = conv.last_message?.content || 'Sin mensajes';
+                const lastMessage = parseMessageContent(rawLastMessage);
                 const preview = lastMessage.substring(0, 35) + (lastMessage.length > 35 ? '...' : '');
                 const isActive = conv.session_id === currentSessionId;
 
@@ -568,7 +569,9 @@
 
             container.innerHTML = messages.map(msg => {
                 const type = msg.message?.type || 'unknown';
-                const content = msg.message?.content || '';
+                const rawContent = msg.message?.content || '';
+                // Limpiar el contenido de información técnica de herramientas
+                const content = parseMessageContent(rawContent);
                 // human = usuario WhatsApp (izquierda), ai = bot/sistema (derecha)
                 const isBot = type === 'ai';
                 return `
@@ -661,6 +664,22 @@
 
         function handleKeyDown(event) {
             if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }
+        }
+
+        function parseMessageContent(content) {
+            if (!content) return '';
+            
+            // Detectar si el mensaje contiene información de herramientas
+            // Formato: [Used tools: Tool: X, Input: {}, Result: {}; ...] mensaje_real
+            const toolsPattern = /\[Used tools:.*?\]/s;
+            
+            if (toolsPattern.test(content)) {
+                // Remover la sección de herramientas y obtener solo el mensaje limpio
+                const cleanContent = content.replace(toolsPattern, '').trim();
+                return cleanContent;
+            }
+            
+            return content;
         }
 
         function escapeHtml(text) { 

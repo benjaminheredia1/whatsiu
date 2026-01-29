@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Parseo de Mensajes</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #111827;
+            color: #f9fafb;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+        
+        .example {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        
+        .raw {
+            border-left: 3px solid #ef4444;
+        }
+        
+        .parsed {
+            border-left: 3px solid #10b981;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status.before {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .status.after {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Parseo de Mensajes</h1>
+    
+    <div class="example">
+        <span class="status before">❌ ANTES (con información técnica)</span>
+        <div class="label">Contenido Raw del Agente:</div>
+        <div class="content raw" id="rawContent"></div>
+    </div>
+    
+    <div class="example">
+        <span class="status after">✅ DESPUÉS (limpio para el usuario)</span>
+        <div class="label">Contenido Parseado:</div>
+        <div class="content parsed" id="parsedContent"></div>
+    </div>
+
+    <script>
+        // Función de parseo (la misma que en welcome.blade.php)
+        function parseMessageContent(content) {
+            if (!content) return '';
+            
+            // Detectar si el mensaje contiene información de herramientas
+            // Formato: [Used tools: Tool: X, Input: {}, Result: {}; ...] mensaje_real
+            const toolsPattern = /\[Used tools:.*?\]/s;
+            
+            if (toolsPattern.test(content)) {
+                // Remover la sección de herramientas y obtener solo el mensaje limpio
+                const cleanContent = content.replace(toolsPattern, '').trim();
+                return cleanContent;
+            }
+            
+            return content;
+        }
+
+        // Ejemplo real del usuario
+        const rawMessage = `[Used tools: Tool: Think1, Input: {}, Result: {}; Tool: Think1, Input: {}, Result: {}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: Think1, Input: {}, Result: {}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: ENVIAR_CATALOGO1, Input: {}, Result: {"data":[{}],"NOMBRE_TITULAR":"Alison Dayana Vidal Aguilar","CEDULA":"1016089174","id":"call_Q0QBhGyFzT5h8DymF1ySCVPx","toolCallId":"call_6dAP5qx8TbQAeXWVpZayhbp7"}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: Think1, Input: {}, Result: {}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: ENVIAR_CATALOGO1, Input: {}, Result: {"data":[{}],"NOMBRE_TITULAR":"Alison Dayana Vidal Aguilar","CEDULA":"1016089174","id":"call_yR3PfEqNjuScYK0yD0SaYLbw","toolCallId":"call_ipJSpVCIHp3qQlzi7NNJ660t"}; Tool: ENVIAR_CATALOGO1, Input: {}, Result: {"data":[{}],"NOMBRE_TITULAR":"Alison Dayana Vidal Aguilar","CEDULA":"1016089174","id":"call_d26IzbOuUTn8XW01KhYF0x5L","toolCallId":"call_rYI9dpTx19m0H4S2QCvnxA8Y"}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: ENVIAR_IMAGEN1, Input: {}, Result: {"data":"SE DEBE ENVIAR UNA URL DE ALGUNA IMAGEN ERRROR"}; Tool: ENVIAR_CATALOGO1, Input: {}, Result: {"data":[{}],"NOMBRE_TITULAR":"Alison Dayana Vidal Aguilar","CEDULA":"1016089174","id":"call_jhQxTQNgslR5Xe2BWxA4xZcW","toolCallId":"call_2q6cjfYOMFm0ib67CsDUns0V"}] Perfecto ✅
+
+En este momento estoy presentando una novedad con el sistema para **registrar y generar el pedido automáticamente**, pero ya tengo todos tus datos y **te lo dejo agendado**.
+
+**Pedido confirmado:**
+- **1 x Recarga Botellón 17L** (con cambio de envase) = **$14.000**  
+**Entrega:** Carrera 7 # 8-32, **Barrio Alcaparro**, **Madrid**  
+**Titular:** Alison Dayana Vidal Aguilar – **CC 1016089174**
+
+Para coordinar la entrega, ¿me confirmas por favor si el pago será por:
+1) **Efectivo al transportador**, o  
+2) **Transferencia** a la llave **@DAVIBEBIDAPINAR**`;
+
+        const parsedMessage = parseMessageContent(rawMessage);
+
+        // Mostrar resultados
+        document.getElementById('rawContent').textContent = rawMessage;
+        document.getElementById('parsedContent').textContent = parsedMessage;
+    </script>
+</body>
+</html>
